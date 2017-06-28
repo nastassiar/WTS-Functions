@@ -1,0 +1,38 @@
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "name": "req",
+      "type": "httpTrigger",
+      "direction": "in",
+      "route": "campaigns/",
+      "methods": [
+        "get",
+        "post",
+        "delete",
+        "put"
+      ]
+    },
+    {
+      "name": "$return",
+      "type": "http",
+      "direction": "out"
+    },
+    {
+      "type": "table",
+      "name": "entries",
+      "tableName": "Campaigns",
+      "take": "50",
+      "connection": "wtsstorage_STORAGE",
+      "direction": "in"
+    },
+    {
+      "type": "table",
+      "name": "tableBinding",
+      "tableName": "Campaigns",
+      "connection": "wtsstorage_STORAGE",
+      "direction": "out"
+    }
+  ],
+  "disabled": false
+}
