@@ -4,17 +4,25 @@
       "name": "queueItem",
       "type": "serviceBusTrigger",
       "direction": "in",
-      "queueName": "sms_data_toprocess",
+      "queueName": "sms_data_toaugment",
       "connection": "AzureWebJobsServiceBus",
       "accessRights": "Manage"
     },
     {
       "type": "serviceBus",
-      "name": "outSBMessage",
-      "queueName": "sms_data_toaugment",
+      "name": "output",
+      "queueName": "sms_data_tostore",
       "connection": "AzureWebJobsServiceBus",
       "accessRights": "Manage",
       "direction": "out"
+    },
+    {
+      "type": "table",
+      "name": "campaignTable",
+      "tableName": "Campaigns",
+      "take": 50,
+      "connection": "WTSStorage_Connection",
+      "direction": "in"
     }
   ],
   "disabled": false
