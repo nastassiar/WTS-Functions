@@ -23,14 +23,14 @@
       "name": "entries",
       "tableName": "Campaigns",
       "take": "50",
-      "connection": "wtsstorage_STORAGE",
+      "connection": "WTSStorage_Connection",
       "direction": "in"
     },
     {
       "type": "table",
       "name": "tableBinding",
       "tableName": "Campaigns",
-      "connection": "wtsstorage_STORAGE",
+      "connection": "WTSStorage_Connection",
       "direction": "out"
     }
   ],
