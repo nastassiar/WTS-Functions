@@ -31,7 +31,7 @@ public static void Run(string queueItem, ICollector<object> output, TraceWriter 
         var obj = new {
             source = "SMS",
             startTimestamp = e.start_timestamp != null ? ConvertTimestampToDatetime(e.start_timestamp.Value, log) : DateTime.Now,
-            completeTimestamp = e.complete_timestamp ? ConvertTimestampToDatetime(e.complete_timestamp.Value, log) : null,
+            completeTimestamp = e.complete_timestamp != null ? ConvertTimestampToDatetime(e.complete_timestamp.Value, log) : null,
             phoneNumber = i.phone,
             lat = i.lat,
             lon = i.lon,
