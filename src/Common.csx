@@ -1,3 +1,8 @@
+private static string GetEnvironmentVariable(string name)
+{
+    return System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
+}
+
 private static DateTime ConvertTimestampToDatetime(double unixTimestamp)
 {
     // Unix timestamp is seconds past epoch
