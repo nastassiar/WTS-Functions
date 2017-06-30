@@ -10,5 +10,5 @@ public static void Run(string queueItem, out string outputSbMsg, TraceWriter log
     // 
     // ******************************************************************************
 
-    outputSbMsg = myQueueItem;
+    outputSbMsg = queueItem;
 }
