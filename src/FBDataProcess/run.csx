@@ -71,8 +71,17 @@ public static void Run(string queueItem, TraceWriter log, ICollector<object> dat
                             id = change.value.post_id;
                             break;
                         default:
+                            // Not one of our recognized types!
+                            // Tag as other!
+                            type = "other";
                             break;
                     }
+                    dynamic record = change.value;
+                    record.page_id = change.value.page_id ?? entry.id;
+                    record.create_datetime = change.value.created_time != null ? ConvertTimestampToDatetime(change.value.created_time.Value) : DateTime.Now;
+                    record.reaction_type = change.value.item == "like" ? "like" : change.value.reaction_type;
+
+                    /*
                     var record = new
                     {
                         // The value of the change sent by facebook (For Testing) TODO: Remove
@@ -113,24 +122,24 @@ public static void Run(string queueItem, TraceWriter log, ICollector<object> dat
                         // 0 means unpublished, 1 means published
                         published = change.value.published
                     };
+                    */
 
-                    
-                    log.Info("Record : "+record);
+                    log.Info($"Record : {record}");
                     dataOutput.Add(record);
 
                     // If the post was not made by the page see if the user exists
                     if (record.pageId != record.senderId)
                     {
-                        var user = new 
+                        var user = new
                         {
-                            senderId = record.senderId,
-                            senderName = record.senderName,
-                            createdTime = record.createdTime
+                            senderId = record.sender_id,
+                            senderName = record.sender_name,
+                            createdTime = record.created_datetime
                         };
-                        //log.Info("User : "+user);
+                        //log.Info("User : " + user);
                         userOutput.Add(user);
                     }
-                    
+
                 }
             }
         }
