@@ -11,7 +11,10 @@ using Newtonsoft.Json.Linq;
 public static void Run(string queueItem, IQueryable<Campaign> campaignTable, TraceWriter log, out string output)
 {
     dynamic msg = JObject.Parse(queueItem);
-    DateTime messageTime = msg.dt_received ?? DateTime.Now;
+    
+    // dt_send is never null
+    DateTime messageTime = msg.dt_send.Value;
+
     // Get all the currently valid campaigns
     IList<Campaign> currentCampaigns = campaignTable.Where(i => i.StartTime < messageTime && i.EndTime > messageTime).ToList<Campaign>();
     IList<string> campaigns = new List<string>();
