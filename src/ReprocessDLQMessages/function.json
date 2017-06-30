@@ -1,0 +1,21 @@
+{
+  "bindings": [
+    {
+      "name": "queueItem",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "queueName": "sms_data_toaugment/$DeadLetterQueue",
+      "connection": "AzureWebJobsServiceBus",
+      "accessRights": "Manage"
+    },
+    {
+      "type": "serviceBus",
+      "name": "outputSbMsg",
+      "queueName": "sms_data_toaugment",
+      "connection": "AzureWebJobsServiceBus",
+      "accessRights": "Manage",
+      "direction": "out"
+    }
+  ],
+  "disabled": true
+}
