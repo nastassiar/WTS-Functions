@@ -23,7 +23,7 @@ public static void Run(string queueItem, IQueryable<Campaign> campaignTable, Tra
             IList<string> terms = c.Terms != null ? c.Terms.Split(',').ToList() : new List<string>(); 
             foreach(string t in terms)
             {
-                if (msg.message != null && msg.message.ToLower().Contains(t.ToLower()))
+                if (msg.message != null && msg.message.Value.ToLower().Contains(t.ToLower()))
                 {
                     campaigns.Add(c.RowKey);
                 }
