@@ -127,7 +127,7 @@ public static void Run(string queueItem, TraceWriter log, ICollector<object> dat
                             senderName = record.senderName,
                             createdTime = record.createdTime
                         };
-                        //log.Info("User : "+user);
+                        log.Info("User : "+user);
                         userOutput.Add(user);
                     }
                     
