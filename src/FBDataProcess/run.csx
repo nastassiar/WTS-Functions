@@ -128,15 +128,15 @@ public static void Run(string queueItem, TraceWriter log, ICollector<object> dat
                     dataOutput.Add(record);
 
                     // If the post was not made by the page see if the user exists
-                    if (record.pageId != record.senderId)
+                    if (record.page_id != record.sender_id)
                     {
                         var user = new
                         {
                             senderId = record.sender_id,
                             senderName = record.sender_name,
-                            createdTime = record.created_datetime
+                            createdTime = record.create_datetime
                         };
-                        log.Info("User : "+user);
+                        //log.Info("User : "+user);
                         //log.Info("User : " + user);
                         userOutput.Add(user);
                     }
