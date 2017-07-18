@@ -12,10 +12,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, IQuery
     // Endpoints for  creating and updating campaigns!
 
     // Id needed for updates and some gets!
-    string id = req.GetQueryNameValuePairs()
-        .FirstOrDefault(q => string.Compare(q.Key, "id", true) == 0)
-        .Value;
-    log.Info("ID : "+ id);
+    string id = req.GetQueryNameValuePairs().FirstOrDefault(q => string.Compare(q.Key, "id", true) == 0).Value;
 
     if (req.Method == HttpMethod.Get)
     {
@@ -61,9 +58,18 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, IQuery
                 existingCampaign.StartTime = requestCampaign.StartTime ?? existingCampaign.StartTime;
                 existingCampaign.EndTime = requestCampaign.EndTime ?? existingCampaign.EndTime;
                 existingCampaign.LastUpdatedTime = DateTime.Now;
-                existingCampaign.Terms = existingCampaign.Terms.Union(requestCampaign.Terms).ToList();
-                existingCampaign.PostIds = existingCampaign.PostIds.Union(requestCampaign.PostIds).ToList();
                 
+                var ecTerms = existingCampaign.Terms.Split(',').ToList();
+                var rcTerms = requestCampaign.Terms.Split(',').ToList();
+                var combinedTerms = ecTerms.Union(rcTerms).ToList();
+                
+                var ecPostIds = existingCampaign.PostIds.Split(',').ToList();
+                var rcPostIds = requestCampaign.PostIds.Split(',').ToList();
+                var combinedPostIds = ecPostIds.Union(rcPostIds).ToList();
+                
+                existingCampaign.Terms = string.Join(",",combinedTerms.ToArray());
+                existingCampaign.PostIds = string.Join(",",combinedPostIds.ToArray());
+
                 tableBinding.Add(existingCampaign);
                 return req.CreateResponse(HttpStatusCode.OK, existingCampaign);
             }
@@ -75,15 +81,15 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, IQuery
             {
                 PartitionKey = "ShujaazCampaigns",
                 // Row Key is based on time
-                RowKey = DateTime.UtcNow.Ticks.ToString("d20"),
+                RowKey = $"{DateTime.UtcNow.Ticks.ToString("d20")}-{requestCampaign.Name ?? "NONAME"}",
                 Name = requestCampaign.Name,
                 Description = requestCampaign.Description,
                 StartTime = requestCampaign.StartTime ?? DateTime.Now,
                 EndTime = requestCampaign.EndTime ?? DateTime.Now.AddYears(1),
                 CreatedTime = DateTime.Now,
                 LastUpdatedTime = DateTime.Now,
-                Terms = requestCampaign.Terms ?? new List<string>(),
-                PostIds =  requestCampaign.PostIds ?? new List<string>()
+                Terms = requestCampaign.Terms,
+                PostIds =  requestCampaign.PostIds
             };
 
              tableBinding.Add(newCampaign);
@@ -114,8 +120,8 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, IQuery
                     EndTime = requestCampaign.EndTime ?? DateTime.Now.AddYears(1),
                     CreatedTime = DateTime.Now,
                     LastUpdatedTime = DateTime.Now,
-                    Terms = requestCampaign.Terms ?? new List<string>(),
-                    PostIds = requestCampaign.PostIds ?? new List<string>()
+                    Terms = requestCampaign.Terms,
+                    PostIds = requestCampaign.PostIds
                 };
 
                 tableBinding.Add(newCampaign);
@@ -157,7 +163,8 @@ public class Campaign : TableEntity
     public DateTime? EndTime  { get; set; }
     public DateTime? CreatedTime  { get; set; }
     public DateTime? LastUpdatedTime  { get; set; }
-    public IList<string> Terms { get; set; }
-    public IList<string> PostIds { get; set; }
+    // THESE HAVE TO BE COMMON SEPARATED STRINGS SINCE TABLE STORAGE DOESN'T SUPPORT STRINGS :(
+    public string Terms { get; set; }
+    public string PostIds { get; set; }
 
 }

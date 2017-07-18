@@ -11,25 +11,30 @@ using Newtonsoft.Json.Linq;
 public static void Run(string queueItem, IQueryable<Campaign> campaignTable, TraceWriter log, out string output)
 {
     dynamic msg = JObject.Parse(queueItem);
-    DateTime messageTime = msg.dt_received ?? DateTime.Now;
-    // Get all the currently valid campaigns
+    DateTime messageTime = msg.dt_send != null ? msg.dt_send.Value : DateTime.Now;
+
     IList<Campaign> currentCampaigns = campaignTable.Where(i => i.StartTime < messageTime && i.EndTime > messageTime).ToList<Campaign>();
     IList<string> campaigns = new List<string>();
-    foreach(Campaign c in currentCampaigns)
+   
+    if (currentCampaigns != null || currentCampaigns.Count() > 0)
     {
-        foreach(string t in c.Terms)
+        foreach (Campaign c in currentCampaigns)
         {
-            if (msg.message != null && msg.message.Contains(t))
+            IList<string> terms = c.Terms != null ? c.Terms.Split(',').ToList() : new List<string>(); 
+            foreach(string t in terms)
             {
-                campaigns.Add(c.RowKey);
+                if (msg.message != null && msg.message.Value.ToLower().Contains(t.ToLower()))
+                {
+                    campaigns.Add(c.RowKey);
+                }
             }
         }
-    }
-
-    msg.campaigns = campaigns;
-
+        msg.campaigns = JArray.FromObject(campaigns);
+    };
     string json = JsonConvert.SerializeObject(msg);
 
+    log.Info("JSON:"+json);
+    
     output = json;
 }
 
@@ -43,7 +48,7 @@ public class Campaign : TableEntity
     public DateTime? EndTime  { get; set; }
     public DateTime? CreatedTime  { get; set; }
     public DateTime? LastUpdatedTime  { get; set; }
-    public IList<string> Terms { get; set; }
-    public IList<string> PostIds { get; set; }
+    public string Terms { get; set; }
+    public string PostIds { get; set; }
 
 }
